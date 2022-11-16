@@ -63,14 +63,3 @@ class Board:
 if __name__ == "__main__":
     play = Board()
     print(play.gameplay_loop())
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
