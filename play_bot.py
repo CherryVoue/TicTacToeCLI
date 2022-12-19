@@ -1,75 +1,58 @@
-import tictactoe
-from random import randint
+"""
+Heavy influence from these three sites:
+https://github.com/Cledersonbc/tic-tac-toe-minimax
+https://levelup.gitconnected.com/mastering-tic-tac-toe-with-minimax-algorithm-3394d65fa88f
+https://stackabuse.com/minimax-and-alpha-beta-pruning-in-python/
+"""
+from win_check import check
+import math
 
-
-#  Takes tictactoe Board class as argument to use for bot gameplay
+#  Takes tictactoe Board and turn number as arguments
 class Bot:
-    def __init__(self, play):
-        self.play = play
-        
+    def __init__(self, board, turn):
+        self.board = board
+        self.turn = turn
+        self.symbols = ['X','O']
+     
+     
+    def empty(self):
+    #  Returns the indexes of all available positions
+        slots = []
+        for i in range(len(self.board)):
+            if self.board[i] == '#':
+                slots.append(i)
+        return slots
     
-    #  Move prio: Center, winning for bot, deny winning for player, side, random
-    def bot_move(self):
-        if self.play.board[4] == '#':
-            return 4
-        
-        for i in range(len(self.play.board)):
-            if self.play.board[i] == '#':
-                self.play.board[i] = self.play.symbols[self.play.turn%2]
-                if self.play.win_check(self.play.board):
-                    self.play.board[i] = '#'
-                    return i
-                self.play.board[i] = '#'
-        
-        for i in range(len(self.play.board)):
-            if self.play.board[i] == '#':
-                self.play.board[i] = self.play.symbols[(self.play.turn+1)%2]
-                if self.play.win_check(self.play.board):
-                    self.play.board[i] = '#'
-                    return i
-                self.play.board[i] = '#'
-                
-        self.sides = [1, 3, 7, 5]
-        self.corners = [0, 6, 8, 2]
-        for i in range(4):
-            if self.play.board[self.sides[i]] == self.play.symbols[(self.play.turn+1)%2]:
-                if self.play.board[self.corners[i]] == '#':
-                    return self.corners[i]
-            if self.play.board[self.corners[i]] == self.play.symbols[(self.play.turn+1)%2]:
-                if self.play.board[self.sides[i]] == '#':
-                    return self.sides[i]
-        
-        return randint(0,8)
     
-
-    #  See loop in main game, added differentiation for bot vs player turns
-    def bot_loop(self):
-        self.play.view_board()
+    def move(self):
+    #  Returns the move value from the minimax function's list ([best move, score])
+        return self.minimax(self.board.count('#'), self.turn)[0]
     
-        self.bot_turn = randint(0,1)
     
-        while '#' in self.play.board:
-            self.play.turn += 1
+    def minimax(self, depth, turn):
+    #  Uses depth directly related to amount of open spaces and turn count to determine optimal moves
+        if turn%2 == 1:
+           best = [None, -math.inf]
+        else:
+            best = [None, math.inf]
             
-            if self.play.turn%2 == self.bot_turn:
-                print(f'Player {self.play.symbols[self.play.turn%2]} (Bot) move location: ')
-                while not self.play.play_move(self.bot_move()):
-                    pass
+        if (end := check(self.board)) != False or depth == 0:
+            if end != False:
+                return [None, 1] if end == 'O' else [None, -1]
+            return [None, 0]
+            
+        for slot in self.empty():
+            self.board[slot] = self.symbols[turn%2]
+            score = self.minimax(depth-1, turn+1)
+            self.board[slot] = '#'
                 
+            score[0] = slot
+            
+            if turn%2 == 1:
+                if score[1] > best[1]:
+                    best = score
             else:
-                while not self.play.play_move(int(input(f'Player {self.play.symbols[self.play.turn%2]} (You) move location: '))):
-                    print('Illegal move.')
-                    
-            if self.play.win_check(self.play.board):
-                if self.play.turn%2 == self.bot_turn:
-                    return f'Player {self.play.symbols[self.play.turn%2]} (Bot) wins!'
-                else:
-                    return 'game'# f'Player {self.play.symbols[self.play.turn%2]} (You) wins!'
+                if score[1] < best[1]:
+                    best = score
                 
-        return "Draw"
-
-
-#  Runtime control, passes main file's Board class into Bot class before starting the game
-if __name__ == "__main__":
-    game = Bot(tictactoe.Board())
-    print(game.bot_loop())
+        return best

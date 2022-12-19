@@ -1,10 +1,17 @@
+from random import randint
+import time
+from play_bot import Bot
+from win_check import check
+
+
 #  Initialize playing board, turn count, and game symbols
 class Board:
-    def __init__(self):
+    def __init__(self, bot_game):
+        self.bot_game = int(bot_game)
         self.board = ['#','#','#',
                       '#','#','#',
                       '#','#','#']
-        self.turn = 0
+        self.turn = randint(0,1)
         self.symbols = ['X','O']
         
 
@@ -17,50 +24,43 @@ class Board:
     
     #  True/False depending on whether the move is valid/invalid, valid move is placed on the board, triggers view_board
     def play_move(self, move):
-        if move > 8 or not self.board[move] == '#':
+        if move > 8 or not self.board[move] == '#' or move < 0:
             return False
         
         self.board[move] = self.symbols[self.turn%2]
         self.view_board()
         return True
     
-    #  Sets rows and columns to their own lists, determines if all symbols in a row/column are the same and not '#'. Checks for diagonal wins separately
-    def win_check(self):
-        self.rows = [self.board[:3], self.board[3:6], self.board[6:]]
-        self.columns = [[], [], []]
-
-        for i in range(3):
-            self.columns[i].append(self.board[i])
-            self.columns[i].append(self.board[i+3])
-            self.columns[i].append(self.board[i+6])
-
-        for i in range(3):
-            if all(x == self.rows[i][0] and x != '#' for x in self.rows[i]):
-                return True
-            if all(x == self.columns[i][0] and x != '#' for x in self.columns[i]):
-                return True
-            
-        if self.board[4] != '#':
-            if self.board[0] == self.board[4] and self.board[4] == self.board[8]:
-                return True
-                
-            if self.board[2] == self.board[4] and self.board[4] == self.board[6]:
-                return True
-            
-        return False
-    
     #  Starts off printing the board, while loop continues until board is full (and determines draw) or a player wins. Embedded loop continues until a valid move is played
     def gameplay_loop(self):
         self.view_board()
         while '#' in self.board:
             self.turn += 1
-            while not self.play_move(int(input(f'Player {self.symbols[self.turn%2]} move location: '))):
-                print('Illegal move.')
-            if self.win_check():
+            if self.bot_game and self.turn%2 == 1:
+                bot = Bot(self.board, self.turn)
+                
+                start = time.time()
+                move = bot.move()
+                end = time.time()
+                
+                print(f'Bot move location: {move}')
+                print(f'Evaluation time {round(end-start, 7)}')
+                
+                self.play_move(move)
+            
+            else:
+                while not self.play_move(int(input(f'Player {self.symbols[self.turn%2]} move location: '))):
+                    print('Illegal move.')
+            
+            if check(self.board) != False:
                 return f'{self.symbols[self.turn%2]} wins!'
+        
         return "Draw"
 
 #  Runtime control, lines will not run if this file is imported elsewhere
 if __name__ == "__main__":
-    play = Board()
+    while (bot_game := input("Would you like to play against the bot? (1 for yes, 0 for no): ")) not in ['0','1']:
+        print('Please select a valid option.')
+        
+    play = Board(bot_game)
     print(play.gameplay_loop())
