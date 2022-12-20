@@ -1,3 +1,5 @@
+#  TODO: Clean up unused code from testing, add comments
+
 from tkinter import *
 from tkinter.ttk import *
 from tictactoe import Board
