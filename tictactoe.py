@@ -1,5 +1,4 @@
 from random import randint
-import time
 from play_bot import Bot
 from win_check import check
 
@@ -22,6 +21,7 @@ class Board:
               f'{self.board[6]} {self.board[7]} {self.board[8]}\n',
               sep = '\n')
     
+    
     #  True/False depending on whether the move is valid/invalid, valid move is placed on the board, triggers view_board
     def play_move(self, move):
         if move > 8 or not self.board[move] == '#' or move < 0:
@@ -31,20 +31,19 @@ class Board:
         self.view_board()
         return True
     
+    
     #  Starts off printing the board, while loop continues until board is full (and determines draw) or a player wins. Embedded loop continues until a valid move is played
-    def gameplay_loop(self):
+    def cli_gameplay_loop(self):
         self.view_board()
         while '#' in self.board:
             self.turn += 1
             if self.bot_game and self.turn%2 == 1:
                 bot = Bot(self.board, self.turn)
                 
-                start = time.time()
-                move = bot.move()
-                end = time.time()
+                move, time = bot.move()
                 
                 print(f'Bot move location: {move}')
-                print(f'Evaluation time {round(end-start, 7)}')
+                print(f'Evaluation time {round(time, 7)}')
                 
                 self.play_move(move)
             
@@ -56,6 +55,14 @@ class Board:
                 return f'{self.symbols[self.turn%2]} wins!'
         
         return "Draw"
+        
+    
+    #  The below function(s) are only used in the gui version of the game
+    def get_symbol(self):
+        return self.symbols[self.turn%2]
+        
+    def get_board(self):
+        return self.board
 
 #  Runtime control, lines will not run if this file is imported elsewhere
 if __name__ == "__main__":
@@ -63,4 +70,4 @@ if __name__ == "__main__":
         print('Please select a valid option.')
         
     play = Board(bot_game)
-    print(play.gameplay_loop())
+    print(play.cli_gameplay_loop())

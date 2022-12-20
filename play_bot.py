@@ -6,6 +6,7 @@ https://stackabuse.com/minimax-and-alpha-beta-pruning-in-python/
 """
 from win_check import check
 import math
+import time
 
 #  Takes tictactoe Board and turn number as arguments
 class Bot:
@@ -26,8 +27,10 @@ class Bot:
     
     def move(self):
     #  Returns the move value from the minimax function's list ([best move, score])
-        return self.minimax(self.board.count('#'), self.turn)[0]
-    
+        start = time.time()
+        move = self.minimax(self.board.count('#'), self.turn)[0]
+        end = time.time()
+        return move, (end-start)
     
     def minimax(self, depth, turn):
     #  Uses depth directly related to amount of open spaces and turn count to determine optimal moves
