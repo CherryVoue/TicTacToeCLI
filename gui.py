@@ -104,12 +104,9 @@ class Game(Tk):
             
         else:
             if play.bot_game == 0 or play.turn%2 == 0:
+                print(move)
                 if play.play_move(move) != False:
                     play.turn += 1
-                
-        print(self.state)
-        print(play.get_board())
-        print(move)
         
         self.state = list(map(lambda x: x.replace('#', ' '), play.get_board()))
         
@@ -127,6 +124,8 @@ class Game(Tk):
             
             self.lbl_time.destroy()
             self.lbl_time = Label(self, text=f'Bot Evaluation time: {round(time, 7)}s')
+            
+            print(move)
             
             play.play_move(move)
             play.turn += 1
