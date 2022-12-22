@@ -3,7 +3,7 @@
 from tkinter import *
 from tkinter.ttk import *
 from tictactoe import Board
-from win_check import check
+from win_check import check, check_winner
 from play_bot import Bot
 from random import randint
 
@@ -20,6 +20,9 @@ class Game(Tk):
         #  Set default text font and size for all buttons
         style = Style(self)
         style.configure('TButton', font=('TkDefaultFont', 50))
+        
+        #  Set visual for winner's slots
+        style.configure('winner.TButton', font=('TkDefaultFont', 50), foreground='green')
 
         #  Get width and height of screen
         screen_width = self.winfo_screenwidth()
@@ -105,10 +108,11 @@ class Game(Tk):
             self.bot_move()
         
         #  Conditions for changing the winner label, previous labels are destroyed to prevent text stacking
-        if (winner := check(self.state)) != False:
+        if (winner := check(play.get_board())) != False:
             #  Checks for winner
             self.lbl_game_state.destroy()
             self.lbl_game_state = Label(self, text=f'Winner: {winner}')
+            self.win_visual()
         if not ' ' in self.state:
             #  Checks for draw
             self.lbl_game_state.destroy()
@@ -169,6 +173,49 @@ class Game(Tk):
         
         #  Back to gameplay loop
         self.gui_gameplay_loop()
+        
+        
+    def win_visual(self):
+        #  Sets winning lane to green
+        sym, lane, num = check_winner(play.get_board())
+        if lane == 'r':
+            if num == 0:
+                self.slot0 = Button(self, text=self.state[0], style='winner.TButton', command = lambda: self.btn_move(0))
+                self.slot1 = Button(self, text=self.state[1], style='winner.TButton', command = lambda: self.btn_move(1))
+                self.slot2 = Button(self, text=self.state[2], style='winner.TButton', command = lambda: self.btn_move(2))
+            elif num == 1:
+                self.slot3 = Button(self, text=self.state[3], style='winner.TButton', command = lambda: self.btn_move(3))
+                self.slot4 = Button(self, text=self.state[4], style='winner.TButton', command = lambda: self.btn_move(4))
+                self.slot5 = Button(self, text=self.state[5], style='winner.TButton', command = lambda: self.btn_move(5))
+            elif num == 2:
+                self.slot6 = Button(self, text=self.state[6], style='winner.TButton', command = lambda: self.btn_move(6))
+                self.slot7 = Button(self, text=self.state[7], style='winner.TButton', command = lambda: self.btn_move(7))
+                self.slot8 = Button(self, text=self.state[8], style='winner.TButton', command = lambda: self.btn_move(8))
+                
+        elif lane == 'c':
+            if num == 0:
+                self.slot0 = Button(self, text=self.state[0], style='winner.TButton', command = lambda: self.btn_move(0))
+                self.slot3 = Button(self, text=self.state[3], style='winner.TButton', command = lambda: self.btn_move(3))
+                self.slot6 = Button(self, text=self.state[6], style='winner.TButton', command = lambda: self.btn_move(6))
+            elif num == 1:
+                self.slot1 = Button(self, text=self.state[1], style='winner.TButton', command = lambda: self.btn_move(1))
+                self.slot4 = Button(self, text=self.state[4], style='winner.TButton', command = lambda: self.btn_move(4))
+                self.slot7 = Button(self, text=self.state[7], style='winner.TButton', command = lambda: self.btn_move(7))
+            elif num == 2:
+                self.slot2 = Button(self, text=self.state[2], style='winner.TButton', command = lambda: self.btn_move(2))
+                self.slot5 = Button(self, text=self.state[5], style='winner.TButton', command = lambda: self.btn_move(5))
+                self.slot8 = Button(self, text=self.state[8], style='winner.TButton', command = lambda: self.btn_move(8))
+                
+        elif lane == 'backslash':
+            self.slot0 = Button(self, text=self.state[0], style='winner.TButton', command = lambda: self.btn_move(0))
+            self.slot4 = Button(self, text=self.state[4], style='winner.TButton', command = lambda: self.btn_move(4))
+            self.slot8 = Button(self, text=self.state[8], style='winner.TButton', command = lambda: self.btn_move(8))
+        elif lane == 'forwardslash':
+            self.slot2 = Button(self, text=self.state[2], style='winner.TButton', command = lambda: self.btn_move(2))
+            self.slot4 = Button(self, text=self.state[4], style='winner.TButton', command = lambda: self.btn_move(4))
+            self.slot6 = Button(self, text=self.state[6], style='winner.TButton', command = lambda: self.btn_move(6))
+                
+        self.build_board()
 
 
 #  Runtime control
