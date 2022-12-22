@@ -13,9 +13,13 @@ class Game(Tk):
         #  Tkinter child class
         super().__init__()
         
+        #  Get width and height of screen
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        
         #  Set default window size
-        win_x = 550
-        win_y = 600
+        win_x = screen_width
+        win_y = screen_height
         
         #  Set default text font and size for all buttons
         style = Style(self)
@@ -23,10 +27,6 @@ class Game(Tk):
         
         #  Set visual for winner's slots
         style.configure('winner.TButton', font=('TkDefaultFont', 50), foreground='green')
-
-        #  Get width and height of screen
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
 
         #  Find center of screen
         center_x = int(screen_width/2 - win_x / 2)
