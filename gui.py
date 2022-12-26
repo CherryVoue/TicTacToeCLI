@@ -36,8 +36,8 @@ class Game(Tk):
         self.title('TicTacToe')
         self.geometry(f'{win_x}x{win_y}+{center_x}+{center_y}')
         
-        #  Window is not resizeable
-        self.resizable(False, False)
+        #  Window is resizable
+        self.resizable(True, True)
         
         #  Columns 0, 1, 2 all same size (width)
         self.columnconfigure(0, weight=1)
